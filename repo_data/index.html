@@ -86,10 +86,11 @@
                                         return;
                                     }
 
+                                    // For each dataset (Figure), start a new Row in the Table...
                                     ds = datasets[d];
                                     ds_html = "<tr><td><a target='new' " +
                                         "href='http://jcb-dataviewer.rupress.org/jcb/browse/" + p.id + "/" + ds.id + "' >" +
-                            ds.name + "</a></td><td></td></tr>";
+                                        ds.name + "</a></td><td>";
 
                                     $.ajax({
                                         url: "http://jcb-dataviewer.rupress.org/jcb/dataset/" + ds.id + "/children/",
@@ -98,6 +99,7 @@
                                         // work with the response
                                         success: function( images ) {
 
+                                            // only add the Figure to the table IF we have some images
                                             if (images.length > 0) {
                                                 html += ds_html;
 
@@ -117,12 +119,8 @@
                                                     } else {
                                                         imgTypes[ext] = 1;
                                                     }
-                                                    // html += "<tr><td></td><td><a target='new' " +
-                                                    //     "href='http://jcb-dataviewer.rupress.org/jcb/img_detail/" + img.id + "/' >" +
-                                                    //     img.imageOrigPath + "</a></td></tr>";
                                                 }
 
-                                                html += "<tr><td></td><td>";
                                                 var imgExts = [];
                                                 for (var e in imgTypes) {
                                                     imgExts.push("" + e + " x " + imgTypes[e]);
@@ -132,12 +130,10 @@
                                                 html += "</td></tr>";
                                             }
 
+                                            // load the next dataset...
                                             handleDataset(d+1);
                                         }
                                     });
-
-
-                                    // handleDataset(d+1);
                                 }
 
                                 // Kick-off loading of datasets...

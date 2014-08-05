@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Starter Template for Bootstrap</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        body {
+          min-height: 2000px;
+          padding-top: 70px;
+        }
+    </style>
+
+    <script>
+        $(function() {
+
+
+            var fileTypesSummary = {}
+
+
+            
+
+            $.ajax({
+                url: "http://jcb-dataviewer.rupress.org/jcb/proj/list/",
+                jsonp: "callback", // 'callback'
+                dataType: "jsonp",
+                // work with the response
+                success: function( data ) {
+
+                    data.sort(function(a, b) {
+                        return b.id - a.id;
+                    });
+
+                    var html = "",
+                        ds_html = "",
+                        p,
+                        paused = false;
+
+                    $("#stop").click(function(){
+                        paused = true;
+                    });
+
+                    var handleProject = function(i) {
+                        if (i == data.length || paused) {
+                            return;
+                        }
+                        html = "";
+                        p = data[i];
+                        html += "<tr><th><a target='new' href='http://jcb-dataviewer.rupress.org/jcb/browse/" + p.id + "/' >" +
+                            p.id + "</a></th><th></th></tr>";
+
+
+                        $.ajax({
+                            url: "http://jcb-dataviewer.rupress.org/jcb/proj/" + p.id + "/children/",
+                            jsonp: "callback", // 'callback'
+                            dataType: "jsonp",
+                            // work with the response
+                            success: function( datasets ) {
+
+                                datasets.sort(function(a, b) {
+                                    return a.name - b.name;
+                                });
+
+                                var handleDataset = function(d) {
+                                    // after the final dataset, handle the next Project
+                                    if (d == datasets.length || paused) {
+                                        $("#jcb-data").append(html);
+                                        handleProject(i+1);
+                                        return;
+                                    }
+
+                                    ds = datasets[d];
+                                    ds_html = "<tr><td><a target='new' " +
+                                        "href='http://jcb-dataviewer.rupress.org/jcb/browse/" + p.id + "/" + ds.id + "' >" +
+                            ds.name + "</a></td><td></td></tr>";
+
+                                    $.ajax({
+                                        url: "http://jcb-dataviewer.rupress.org/jcb/dataset/" + ds.id + "/children/",
+                                        jsonp: "callback", // 'callback'
+                                        dataType: "jsonp",
+                                        // work with the response
+                                        success: function( images ) {
+
+                                            if (images.length > 0) {
+                                                html += ds_html;
+
+                                                images.sort(function(a, b) {
+                                                    return a.imagePart - b.imagePart;
+                                                });
+
+                                                var imgTypes = {};      // E.g. {'tif':5, 'lsm':1}
+                                                var img, tokens, ext;
+                                                for (var j=0; j < images.length; j++) {
+
+                                                    img = images[j];
+                                                    tokens = img.imageOrigPath.split(".");
+                                                    ext = tokens[tokens.length-1];
+                                                    if (imgTypes[ext]) {
+                                                        imgTypes[ext] += 1;
+                                                    } else {
+                                                        imgTypes[ext] = 1;
+                                                    }
+                                                    // html += "<tr><td></td><td><a target='new' " +
+                                                    //     "href='http://jcb-dataviewer.rupress.org/jcb/img_detail/" + img.id + "/' >" +
+                                                    //     img.imageOrigPath + "</a></td></tr>";
+                                                }
+
+                                                html += "<tr><td></td><td>";
+                                                var imgExts = [];
+                                                for (var e in imgTypes) {
+                                                    imgExts.push("" + e + " x " + imgTypes[e]);
+                                                }
+
+                                                html += imgExts.join(" | ");
+                                                html += "</td></tr>";
+                                            }
+
+                                            handleDataset(d+1);
+                                        }
+                                    });
+
+
+                                    // handleDataset(d+1);
+                                }
+
+                                // Kick-off loading of datasets...
+                                handleDataset(0);
+                            }
+                        });
+                    }
+
+                    handleProject(0);
+                }
+            });
+        });
+
+
+    </script>
+
+  </head>
+
+  <body>
+
+
+        <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">JCB Data Table</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right" role="form">
+            <button id="stop" type="button" class="btn btn-danger">Stop Loading</button>
+          </form>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+
+    <table id="jcb-data" class="table">
+
+    </table>
+
+    </div>
+
+  </body>
+</html>

@@ -98,7 +98,7 @@
                                     ds = datasets[d];
                                     ds_html = "<tr><td><a target='new' " +
                                         "href='http://jcb-dataviewer.rupress.org/jcb/browse/" + p.id + "/" + ds.id + "' >" +
-                                        ds.name + "</a></td><td>";
+                                        ds.name + "</a></td>";
 
                                     $.ajax({
                                         url: "http://jcb-dataviewer.rupress.org/jcb/dataset/" + ds.id + "/children/",
@@ -117,7 +117,9 @@
 
                                                 var imgTypes = {};      // E.g. {'tif':5, 'lsm':1}
                                                 var img, tokens, ext;
-                                                var thumbs = "";
+                                                var thumbsTable = "<table class='imgTable'><tr>";
+                                                thumbsTable += '<td><button type="button" class="btn btn-link btn-sm load-imgs">Load Images</button></td>';
+
                                                 for (var j=0; j < images.length; j++) {
 
                                                     img = images[j];
@@ -129,24 +131,25 @@
                                                         imgTypes[ext] = 1;
                                                     }
                                                     // show first 10 thumbnails
-                                                    if (j < 8) {
-                                                        thumbs += '<span data-iid="' + img.id + '">';
-                                                        thumbs += '<img src="http://jcb-dataviewer.rupress.org/jcb/render_thumbnail/' + img.id + '/"/>';
-                                                        thumbs += '</span>';
+                                                    if (j < 10) {
+                                                        thumbsTable += '<th data-iid="' + img.id + '">';
+                                                        thumbsTable += '<img src="http://jcb-dataviewer.rupress.org/jcb/render_thumbnail/' + img.id + '/"/>';
+                                                        thumbsTable += '</th>';
                                                     }
-                                                    if (j === 8) {
-                                                        thumbs += " more...";
-                                                    }
+                                                    // if (j === 8) {
+                                                    //     thumbsTable += " more...";
+                                                    // }
                                                 }
+                                                thumbsTable += "</tr></table>";
 
                                                 var imgExts = [];
                                                 for (var e in imgTypes) {
                                                     imgExts.push("" + e + " x " + imgTypes[e]);
                                                 }
 
-                                                html += imgExts.join(" | ");
-                                                html += '<button type="button" class="btn btn-link btn-sm load-imgs">Load Images</button>';
-                                                html += "</td><td>" + thumbs + "</td>";
+                                                html += "<td>" + imgExts.join(" | ") + "</td>";
+                                                // html += '<td><button type="button" class="btn btn-link btn-sm load-imgs">Load Images</button></td>';
+                                                html += "<td>" + thumbsTable + "</td>";
                                                 html += "</tr>";
                                             }
 

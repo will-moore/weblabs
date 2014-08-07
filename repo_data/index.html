@@ -36,11 +36,53 @@
 
 
             $( "#dataTable" ).on( "click", ".load-imgs", function(event) {
-                var $figTd = $(event.target).parent();
-                $('span', $figTd).each(function(){
-                    var $span = $(this),
-                        thumbId = $span.attr('data-iid');
+                var $imgTable = $(event.target).parent().parent().parent();
+
+                // add a few rows, ready for data
+                var colCount = $('td', $imgTable).length;
+
+                var rowNames = ["size X", "size Y", "size Z", "size C", "size T"];
+
+                var row = new Array(colCount).join("<td></td>");
+                var rows = "";
+                for (var r=0; r<rowNames.length; r++) {
+                    rows += "<tr class='imgdata'><td>" + rowNames[r] + "</td>" + row + "</tr>";
+                }
+                // var rows = new Array(rowCount+1).join(row);
+                $imgTable.append(rows);
+
+                var $rows = $imgTable.children('.imgdata');
+
+                $imgTable.children('tr').first().children('td').each(function(col, th){
+                    var $th = $(this),
+                        thumbId = $th.attr('data-iid');
                     // TODO load json data for each image.
+                    if (!thumbId) {
+                        return;
+                    }
+                    $.ajax({
+                        url: "http://jcb-dataviewer.rupress.org/jcb/imgData/" + thumbId + "/",
+                        jsonp: "callback", // 'callback'
+                        dataType: "jsonp",
+                        // work with the response
+                        success: function( data ) {
+
+                            var tdata = [
+                                    data.size.width,
+                                    data.size.height,
+                                    data.size.z,
+                                    data.size.c,
+                                    data.size.t
+                                ];
+
+
+                            $rows.each(function(idx, r) {
+                                var $td = $(r).children('td:nth-child(' + (col+1) +')');
+                                $td.text( tdata[idx] );
+                            });
+                        }
+                    });
+
                 });
             });
             
@@ -132,9 +174,9 @@
                                                     }
                                                     // show first 10 thumbnails
                                                     if (j < 10) {
-                                                        thumbsTable += '<th data-iid="' + img.id + '">';
+                                                        thumbsTable += '<td data-iid="' + img.id + '">';
                                                         thumbsTable += '<img src="http://jcb-dataviewer.rupress.org/jcb/render_thumbnail/' + img.id + '/"/>';
-                                                        thumbsTable += '</th>';
+                                                        thumbsTable += '</td>';
                                                     }
                                                     // if (j === 8) {
                                                     //     thumbsTable += " more...";

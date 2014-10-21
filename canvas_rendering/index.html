@@ -4,6 +4,7 @@
 
   <script type="text/javascript" src="javascript/3rdparty/jquery-1.7.2.js"></script>
   <script type="text/javascript" src="javascript/3rdparty/jquery-ui.js"></script>
+  <script type="text/javascript" src="javascript/3rdparty/d3.min.js"></script>
 
   <script type="text/javascript" src="javascript/main.js"></script>
 
@@ -11,10 +12,10 @@
 
   .ui-slider {
 
-    width: 300px;
+    width: 512px;
     height: 4px;
     position: relative;
-    margin: 20px;
+    margin: 20px 0;
   }
 
   .ui-slider .ui-slider-handle {
@@ -28,6 +29,35 @@
     top: -5px;
 }
 
+.chart {
+/*  height: 300px;
+  border: solid black 1px;
+  position: relative;
+  width: 512px;*/
+}
+
+/*.chart div {
+  background-color: red;
+  padding: 0px;
+  margin: 0px;
+  width: 2px;
+  position: absolute;
+  bottom: 0px;
+  height: 100%;
+}*/
+.content {
+  float: left;
+}
+
+.series {
+    fill: none;
+}
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
   </style>
 </head>
 
@@ -36,11 +66,20 @@
 <!--     <h3>DNA Stain</h3>
     <input data-type="minimum" type="range" min="0" max="255" value="0">
     <input data-type="maximum" type="range" min="0" max="255" value="255"> -->
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas">
+    </canvas>
   </div>
 
-  <div id="slider_blue" style="background: blue;"></div>
-  <div id="slider_green" style="background: green;"></div>
-  <div id="slider_red" style="background: red;"></div>
+  <div style='float:left; margin: 20px'>
+    <div class="chart">
+      <!-- <div id="start"></div>
+      <div id="end"></div> -->
+    </div>
+
+    <div id="slider_blue" style="background: blue;"></div>
+    <div id="slider_green" style="background: green;"></div>
+    <div id="slider_red" style="background: red;"></div>
+  </div>
+
 </body>
 </html>

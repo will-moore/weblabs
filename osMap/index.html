@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>OS Landranger Maps</title>
+<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.7.0/ol.css" type="text/css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.7.0/ol.js"></script>
+
+<style>
+h2 {
+  font-size: 1.5em;
+  line-height: 15px;
+}
+
+.scale-cnt {
+  margin: 5px;
+}
+
+.edit-form-ctn {
+}
+
+.edit-form {
+  /*float: left;*/
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 5px;
+  width: 230px;
+  padding: 4px;
+  border: 1px solid black;
+  background-color: white;
+}
+
+.edit-form input[type="button"] {
+  float: right;
+}
+
+.edit-form-elem label {
+  display: block;
+  float: left;
+  width: 85px;
+}
+
+.edit-form-elem input[type="text"] {
+  width: 60px;
+}
+
+.edit-form-elem select {
+  width: 130px;
+}
+
+</style>
+</head>
+<body>
+<div class="container-fluid">
+
+<div class="row-fluid">
+  <div class="span12">
+    <div id="map" class="map"></div>
+  </div>
+</div>
+
+<div class="edit-form">
+  <input id="refresh-polygons" type="button" value="Refresh" />
+  <h2>Polygons</h2>
+  <div class="edit-form-elem">
+    <label>Text: </label>
+    <select id="polygons-text">
+      <option value="hide">Hide</option>
+      <option value="normal" selected="selected">Normal</option>
+      <option value="shorten">Shorten</option>
+      <option value="wrap">Wrap</option>
+    </select>
+    <br />
+    <label title="Max Resolution Denominator">MaxReso.:</label>
+    <select id="polygons-maxreso">
+      <option value="38400">38,400</option>
+      <option value="19200">19,200</option>
+      <option value="9600">9,600</option>
+      <option value="4800">4,800</option>
+      <option value="2400">2,400</option>
+      <option value="1200" selected="selected">1,200</option>
+      <option value="600">600</option>
+      <option value="300">300</option>
+      <option value="150">150</option>
+      <option value="75">75</option>
+      <option value="32">32</option>
+      <option value="16">16</option>
+      <option value="8">8</option>
+    </select>
+    <br />
+    <label>Align: </label>
+    <select id="polygons-align">
+      <option value="center" selected="selected">Center</option>
+      <option value="end">End</option>
+      <option value="left">Left</option>
+      <option value="right">Right</option>
+      <option value="start">Start</option>
+    </select>
+    <br />
+    <label>Baseline: </label>
+    <select id="polygons-baseline">
+      <option value="alphabetic">Alphabetic</option>
+      <option value="bottom">Bottom</option>
+      <option value="hanging">Hanging</option>
+      <option value="ideographic">Ideographic</option>
+      <option value="middle" selected="selected">Middle</option>
+      <option value="top">Top</option>
+    </select>
+    <br />
+    <label>Rotation: </label>
+    <select id="polygons-rotation">
+      <option value="0">0°</option>
+      <option value="0.785398164">45°</option>
+      <option value="1.570796327">90°</option>
+    </select>
+    <br />
+    <label>Font: </label>
+    <select id="polygons-font">
+      <option value="Arial">Arial</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Quattrocento Sans">Quattrocento</option>
+      <option value="Verdana" selected="selected">Verdana</option>
+    </select>
+    <br />
+    <label>Weight: </label>
+    <select id="polygons-weight">
+      <option value="bold" selected="selected">Bold</option>
+      <option value="normal">Normal</option>
+    </select>
+    <br />
+    <label>Size: </label>
+    <input type="text" value="10px" id="polygons-size" />
+    <br />
+    <label>Offset X:</label>
+    <input type="text" value="0" id="polygons-offset-x" />
+    <br />
+    <label>Offset Y:</label>
+    <input type="text" value="0" id="polygons-offset-y" />
+    <br />
+    <label>Color :</label>
+    <input type="text" value="blue" id="polygons-color" />
+    <br />
+    <label title="Outline Color">O. Color:</label>
+    <input type="text" value="#ffffff" id="polygons-outline" />
+    <br />
+    <label title="Outline Width">O. Width :</label>
+    <input type="text" value="3" id="polygons-outline-width" />
+  </div>
+</div>
+
+</div>
+<script>
+var myDom = {
+  polygons: {
+    text: document.getElementById('polygons-text'),
+    align: document.getElementById('polygons-align'),
+    baseline: document.getElementById('polygons-baseline'),
+    rotation: document.getElementById('polygons-rotation'),
+    font: document.getElementById('polygons-font'),
+    weight: document.getElementById('polygons-weight'),
+    size: document.getElementById('polygons-size'),
+    offsetX: document.getElementById('polygons-offset-x'),
+    offsetY: document.getElementById('polygons-offset-y'),
+    color: document.getElementById('polygons-color'),
+    outline: document.getElementById('polygons-outline'),
+    outlineWidth: document.getElementById('polygons-outline-width'),
+    maxreso: document.getElementById('polygons-maxreso')
+  }
+};
+
+var getText = function(feature, resolution, dom) {
+  var type = dom.text.value;
+  var maxResolution = dom.maxreso.value;
+  var text = feature.get('name');
+
+  if (resolution > maxResolution) {
+    text = '';
+  } else if (type == 'hide') {
+    text = '';
+  } else if (type == 'shorten') {
+    text = text.trunc(12);
+  } else if (type == 'wrap') {
+    text = stringDivider(text, 16, '\n');
+  }
+
+  return text;
+};
+
+
+var createTextStyle = function(feature, resolution, dom) {
+  var align = dom.align.value;
+  var baseline = dom.baseline.value;
+  var size = dom.size.value;
+  var offsetX = parseInt(dom.offsetX.value, 10);
+  var offsetY = parseInt(dom.offsetY.value, 10);
+  var weight = dom.weight.value;
+  var rotation = parseFloat(dom.rotation.value);
+  var font = weight + ' ' + size + ' ' + dom.font.value;
+  var fillColor = dom.color.value;
+  var outlineColor = dom.outline.value;
+  var outlineWidth = parseInt(dom.outlineWidth.value, 10);
+
+  return new ol.style.Text({
+    textAlign: align,
+    textBaseline: baseline,
+    font: font,
+    text: getText(feature, resolution, dom),
+    fill: new ol.style.Fill({color: fillColor}),
+    stroke: new ol.style.Stroke({color: outlineColor, width: outlineWidth}),
+    offsetX: offsetX,
+    offsetY: offsetY,
+    rotation: rotation
+  });
+};
+
+
+// Polygons
+var createPolygonStyleFunction = function() {
+  return function(feature, resolution) {
+    var style = new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        color: 'blue',
+        width: 1
+      }),
+      fill: new ol.style.Fill({
+        color: 'rgba(0, 0, 255, 0.1)'
+      }),
+      text: createTextStyle(feature, resolution, myDom.polygons)
+    });
+    return [style];
+  };
+};
+
+var vectorPolygons = new ol.layer.Vector({
+  source: new ol.source.Vector({
+    url: 'osMap.geojson',
+    format: new ol.format.GeoJSON()
+  }),
+  style: createPolygonStyleFunction()
+});
+
+
+var view = new ol.View({
+    // center: [-8161939, 6095025],
+    // center: [-200000, 7195025],
+    // center: [362500, 850500],
+    center: ol.proj.transform([-2.96718, 56.462868], 'EPSG:4326', 'EPSG:3857'),
+    zoom: 10
+  });
+
+var map = new ol.Map({
+  layers: [
+    new ol.layer.Tile({
+      source: new ol.source.OSM({layer: 'osm'})
+    }),
+    vectorPolygons,
+  ],
+  target: 'map',
+  view: view
+});
+
+map.on('singleclick', function(evt) {
+  // document.getElementById('info').innerHTML = '';
+  var viewResolution = /** @type {number} */ (view.getResolution());
+  // var url = wmsSource.getGetFeatureInfoUrl(
+  //     evt.coordinate, viewResolution, 'EPSG:3857',
+  //     {'INFO_FORMAT': 'text/html'});
+  // if (url) {
+  //   document.getElementById('info').innerHTML =
+  //       '<iframe seamless src="' + url + '"></iframe>';
+  // }
+  console.log(vectorPolygons);
+  var d = vectorPolygons.getFeatureFromEvent(
+      evt.coordinate)
+      // {'INFO_FORMAT': 'text/html'});
+  console.log(d);
+});
+
+
+
+$('#refresh-polygons').click(function() {
+  vectorPolygons.setStyle(createPolygonStyleFunction());
+});
+
+
+/**
+ * @param {number} n The max number of characters to keep.
+ * @return {string} Truncated string.
+ */
+String.prototype.trunc = String.prototype.trunc ||
+    function(n) {
+      return this.length > n ? this.substr(0, n - 1) + '...' : this.substr(0);
+    };
+
+
+// http://stackoverflow.com/questions/14484787/wrap-text-in-javascript
+function stringDivider(str, width, spaceReplacer) {
+  if (str.length > width) {
+    var p = width;
+    for (; p > 0 && (str[p] != ' ' && str[p] != '-'); p--) {
+    }
+    if (p > 0) {
+      var left;
+      if (str.substring(p, p + 1) == '-') {
+        left = str.substring(0, p + 1);
+      } else {
+        left = str.substring(0, p);
+      }
+      var right = str.substring(p + 1);
+      return left + spaceReplacer + stringDivider(right, width, spaceReplacer);
+    }
+  }
+  return str;
+}
+
+</script>
+</body>
+</html>

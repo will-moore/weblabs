@@ -23,6 +23,7 @@ h2 {
 
 .edit-form {
   /*float: left;*/
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -222,11 +223,11 @@ var createPolygonStyleFunction = function() {
   return function(feature, resolution) {
     var style = new ol.style.Style({
       stroke: new ol.style.Stroke({
-        color: 'blue',
+        color: '#ff00ff',
         width: 1
       }),
       fill: new ol.style.Fill({
-        color: 'rgba(0, 0, 255, 0.1)'
+        color: 'rgba(255, 0, 255, 0.1)'
       }),
       text: createTextStyle(feature, resolution, myDom.polygons)
     });
@@ -248,7 +249,7 @@ var view = new ol.View({
     // center: [-200000, 7195025],
     // center: [362500, 850500],
     center: ol.proj.transform([-2.96718, 56.462868], 'EPSG:4326', 'EPSG:3857'),
-    zoom: 10
+    zoom: 8
   });
 
 var map = new ol.Map({

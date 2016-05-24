@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+    <link href="https://wwwdev.ebi.ac.uk/mi/media/static/omeroweb.viewer.min.css" type="text/css" rel="stylesheet"></link>
+    <script src="https://wwwdev.ebi.ac.uk/mi/media/static/omeroweb.viewer.min.js" type="text/javascript"></script>
+
+    <style type="text/css">
+    .viewport {
+        height: 500px;
+        width: 500px;
+    }
+    </style>
+
+    <script>
+
+        $(function(){
+            console.log('ready...2');
+            /* Prepare the viewport */
+            var viewport = $.WeblitzViewport($("#viewport"), "https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/", {
+                'mediaroot': "https://wwwdev.ebi.ac.uk/mi/media/static/"
+            });
+            /* Load the selected image into the viewport */
+            viewport.load(87269);
+
+
+            var viewport2 = $.WeblitzViewport($("#viewport2"), "https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/", {
+                'mediaroot': "https://wwwdev.ebi.ac.uk/mi/media/static/"
+            });
+            /* Load the selected image into the viewport */
+            viewport2.load(87043);
+        });
+    </script>
+</head>
+
+<body>
+    <div style="float:left">
+        <div id="viewport" class="viewport"></div>
+    </div>
+    <div style="float:left">
+        <div id="viewport2" class="viewport"></div>
+    </div>
+</body>
+
+</html>
+

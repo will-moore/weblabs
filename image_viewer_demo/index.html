@@ -1,7 +1,30 @@
 <!doctype html>
+<!-- Example for discussion at https://www.openmicroscopy.org/community/viewtopic.php?f=6&t=8058&p=17114 -->
 <html>
 <head>
-    <link href="https://wwwdev.ebi.ac.uk/mi/media/static/omeroweb.viewer.min.css" type="text/css" rel="stylesheet"></link>
+    <!-- This min.css contains all the smaller css files below... ->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/omeroweb.viewer.min.css" type="text/css" rel="stylesheet"></link> -->
+
+    <!-- But many of these can be removed if we limit the functionality of the viewer (E.g. no Channel sliders, color-pickers etc) -->
+
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/reset.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.body.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webclient/css/dusty.css" type="text/css" rel="stylesheet"></link> -->
+    <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.viewport.css" type="text/css" rel="stylesheet"></link>
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.toolbar.css" type="text/css" rel="stylesheet"></link> -->
+    <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.gs_slider.css" type="text/css" rel="stylesheet"></link>
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/base.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.snippet_header_logo.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.postit.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.rangewidget.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/3rdparty/farbtastic-1.2/farbtastic.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/ome.colorbtn.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/3rdparty/JQuerySpinBtn-1.3a/JQuerySpinBtn.css" type="text/css" rel="stylesheet"></link> -->
+    <!-- <link href="https://wwwdev.ebi.ac.uk/mi/media/static/3rdparty/jquery-ui-1.10.4/themes/base/jquery-ui.all.css" type="text/css" rel="stylesheet"></link> -->
+    <link href="https://wwwdev.ebi.ac.uk/mi/media/static/webgateway/css/omero_image.css" type="text/css" rel="stylesheet"></link>
+    <link href="https://wwwdev.ebi.ac.uk/mi/media/static/3rdparty/panojs-2.0.0/panojs.css" type="text/css" rel="stylesheet"></link>
+
+
     <script src="https://wwwdev.ebi.ac.uk/mi/media/static/omeroweb.viewer.min.js" type="text/javascript"></script>
 
     <style type="text/css">
@@ -12,14 +35,14 @@
     .thumbList {
         width: 500px;
         float: left;
+        margin: 20px;
     }
     </style>
 
     <script>
 
         $(function(){
-            console.log('ready...2');
-            /* Prepare the viewport */
+            /* Prepare the left viewport */
             var viewport = $.WeblitzViewport($("#viewport"), "https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/", {
                 'mediaroot': "https://wwwdev.ebi.ac.uk/mi/media/static/"
             });
@@ -27,6 +50,14 @@
             viewport.load(87269);
 
 
+            // Alternative for testing non-big image viewer
+            // viewport = $.WeblitzViewport($("#viewport"), "https://learning.openmicroscopy.org/dundee/webgateway/", {
+            //         'mediaroot': "https://learning.openmicroscopy.org/dundee/static/"
+            //     });
+            // viewport.load(1296);
+
+
+            /* Prepare right viewport */
             var viewport2 = $.WeblitzViewport($("#viewport2"), "https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/", {
                 'mediaroot': "https://wwwdev.ebi.ac.uk/mi/media/static/"
             });
@@ -36,14 +67,12 @@
             $(".thumb").click(function(){
                 var iid = $(this).attr('data-id');
                 iid = parseInt(iid);
-                console.log(iid);
                 viewport.load(iid);
             });
 
             $(".thumb2").click(function(){
                 var iid = $(this).attr('data-id');
                 iid = parseInt(iid);
-                console.log(iid);
                 viewport2.load(iid);
             });
         });
@@ -51,10 +80,10 @@
 </head>
 
 <body>
-    <div style="float:left">
+    <div class="thumbList" style="float:left">
         <div id="viewport" class="viewport"></div>
     </div>
-    <div style="float:left">
+    <div class="thumbList" style="float:left">
         <div id="viewport2" class="viewport"></div>
     </div>
 

@@ -87,8 +87,13 @@
             $(".thumb2").click(function(){
                 var iid = $(this).attr('data-id');
                 iid = parseInt(iid);
-                // If all images are 'Big' OR all images are not-tiled, there's no bug.
-                // Simply load new image...
+
+                var $parent = $("#viewport2").parent();
+                $("#viewport2").remove();
+                $parent.append("<div id='viewport2' class='viewport'></div>");
+                viewport2 = $.WeblitzViewport($("#viewport2"), "https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/", {
+                    'mediaroot': "https://wwwdev.ebi.ac.uk/mi/media/static/"
+                });
                 viewport2.load(iid);
             });
         });

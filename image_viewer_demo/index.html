@@ -41,28 +41,51 @@
 
     <script>
 
+        var viewport, viewport2;
+
+        // workaround for bug https://github.com/openmicroscopy/openmicroscopy/pull/4701
+        var resetZoomControls = function(viewer) {
+            $(".wb_zoomOut", viewer.viewport)
+                .off()
+                .click(function(){
+                    var zm = viewer.getZoom();
+                    viewer.setZoom(zm - 20);
+                });
+            $(".wb_zoomIn", viewer.viewport)
+                .off()
+                .click(function(){
+                    var zm = viewer.getZoom();
+                    viewer.setZoom(zm + 20);
+                });
+            $(".wb_zoom11", viewer.viewport)
+                .off()
+                .click(function(){
+                    viewer.setZoom(100);
+                });
+        }
+        var resetZoomHandling = function() {
+            // When any viewport loads, have to reset zoom controls on both viewports!
+            resetZoomControls(viewport);
+            resetZoomControls(viewport2);
+        }
+
         $(function(){
             /* Prepare the left viewport */
-            var viewport = $.WeblitzViewport($("#viewport"), "https://nightshade.openmicroscopy.org/webgateway/", {
+            viewport = $.WeblitzViewport($("#viewport"), "https://nightshade.openmicroscopy.org/webgateway/", {
                 'mediaroot': "https://nightshade.openmicroscopy.org/static/"
             });
+            viewport.bind('imageLoad', resetZoomHandling);
             /* Load the selected image into the viewport */
             viewport.load(3933597);
 
 
-            // Alternative for testing non-big image viewer
-            // viewport = $.WeblitzViewport($("#viewport"), "https://learning.openmicroscopy.org/dundee/webgateway/", {
-            //         'mediaroot': "https://learning.openmicroscopy.org/dundee/static/"
-            //     });
-            // viewport.load(1296);
-
-
             /* Prepare right viewport */
-            var viewport2 = $.WeblitzViewport($("#viewport2"), "https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/", {
-                'mediaroot': "https://wwwdev.ebi.ac.uk/mi/media/static/"
+            viewport2 = $.WeblitzViewport($("#viewport2"), "https://nightshade.openmicroscopy.org/webgateway/", {
+                'mediaroot': "https://nightshade.openmicroscopy.org/static/"
             });
+            viewport2.bind('imageLoad', resetZoomHandling);
             /* Load the selected image into the viewport */
-            viewport2.load(87043);
+            viewport2.load(3925542);
 
             $(".thumb").click(function(){
                 var iid = $(this).attr('data-id');
@@ -80,6 +103,7 @@
                 viewport = $.WeblitzViewport($("#viewport"), "https://nightshade.openmicroscopy.org/webgateway/", {
                     'mediaroot': "https://nightshade.openmicroscopy.org/static/"
                 });
+                viewport.bind('imageLoad', resetZoomHandling);
                 /* Load the selected image into the viewport */
                 viewport.load(iid);
             });
@@ -91,9 +115,10 @@
                 var $parent = $("#viewport2").parent();
                 $("#viewport2").remove();
                 $parent.append("<div id='viewport2' class='viewport'></div>");
-                viewport2 = $.WeblitzViewport($("#viewport2"), "https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/", {
-                    'mediaroot': "https://wwwdev.ebi.ac.uk/mi/media/static/"
+                viewport2 = $.WeblitzViewport($("#viewport2"), "https://nightshade.openmicroscopy.org/webgateway/", {
+                    'mediaroot': "https://nightshade.openmicroscopy.org/static/"
                 });
+                viewport2.bind('imageLoad', resetZoomHandling);
                 viewport2.load(iid);
             });
         });
@@ -118,11 +143,11 @@
         <img class="thumb" data-id="3925542" src="https://nightshade.openmicroscopy.org/webgateway/render_thumbnail/3925542/96/"/>
     </div>
     <div class="thumbList">
-        <img class="thumb2" data-id="87044" src="https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/render_thumbnail/87044/96/"/>
+        <img class="thumb2" data-id="3933597" src="https://nightshade.openmicroscopy.org/webgateway/render_thumbnail/3933597/96/"/>
 
-        <img class="thumb2" data-id="87015" src="https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/render_thumbnail/87015/96/"/>
+        <img class="thumb2" data-id="3946830" src="https://nightshade.openmicroscopy.org/webgateway/render_thumbnail/3946830/96/"/>
 
-        <img class="thumb2" data-id="86899" src="https://wwwdev.ebi.ac.uk/mi/media/omero/webgateway/render_thumbnail/86899/96/"/>
+        <img class="thumb2" data-id="3925542" src="https://nightshade.openmicroscopy.org/webgateway/render_thumbnail/3925542/96/"/>
     </div>
 </body>
 

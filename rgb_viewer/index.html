@@ -29,6 +29,8 @@ $(function(){
             console.log(chIdx);
             $this.data('chIdx', parseInt(chIdx, 10));
         });
+        // Populate channels sliders and render image
+        renderSliders();
         render();
     });
 
@@ -52,11 +54,49 @@ $(function(){
         console.log(chIdx, chLabel);
         $label.text(chLabel);
         $label.data('chIdx', parseInt(chIdx, 10));
+
+        renderSliders();
         render();
     });
 
 
-    // Get image src from channel settings and set image src.
+    // On 'stop' sliding channel sliders...
+    $('input.chStart').on('change', function(){
+        // update the imgData store...
+        var $this = $(this);
+        var chIdx = $this.data('chIdx');
+        console.log(chIdx, parseInt($this.val()));
+        imgData.channels[chIdx].window.start = parseInt($this.val(), 10);
+        render();
+    });
+    $('input.chEnd').on('change', function(){
+        // update the imgData store...
+        var $this = $(this);
+        var chIdx = $this.data('chIdx');
+        console.log(chIdx, parseInt($this.val()));
+        imgData.channels[chIdx].window.end = parseInt($this.val(), 10);
+        render();
+    });
+
+
+    // When channel selection changed display correct slider for that channel
+    function renderSliders(){
+        var channels = [];
+        $(".channelLabel").each(function(i, ch){
+            channels.push($(this).data('chIdx'));
+        });
+        $(".range-slider").each(function(i, section){
+            var w = imgData.channels[channels[i]].window;
+            var $this = $(section);
+            $('input', $this).attr({'min': w.min, 'max': w.max})
+                             .data('chIdx', channels[i]);
+            $('input.chStart').val(w.start);
+            $('input.chEnd').val(w.end);
+        });
+    };
+
+
+    // Get image src from channel settings start/stop from imgData and set image src.
     function render(){
         var channels = [];
         var colors = ['0000FF', '00FF00', 'FF0000'];
@@ -72,7 +112,8 @@ $(function(){
         channels.sort(compareIdx);
 
         var chs = channels.map(function(ch){
-            return (ch.idx + 1) + '$' + ch.color;
+            var w = imgData.channels[ch.idx].window;
+            return (ch.idx + 1) + '|' + w.start + ':' + w.end + '$' + ch.color;
         });
         chs = chs.join(',');
         var src = baseUrl + "webclient/render_image/1458547/0/0/?c=" + chs;
@@ -112,6 +153,66 @@ $(function(){
         right: 20px;
         z-index: 10;
     }
+
+    /* styles from http://stackoverflow.com/questions/4753946/html5-form-slider-with-two-inputs-possible */
+    section.range-slider {
+        position: relative;
+        width: 200px;
+        height: 30px;
+        text-align: center;
+        margin: auto;
+        margin-top: 2px;
+        margin-bottom: 2px;
+    }
+    section.range-slider input {
+        pointer-events: none;
+        position: absolute;
+        overflow: hidden;
+        left: 0;
+        top: 5px;
+        width: 200px;
+        outline: none;
+        height: 18px;
+        margin: 0;
+        padding: 0;
+    }
+    section.range-slider input::-webkit-slider-thumb {
+        pointer-events: all;
+        position: relative;
+        z-index: 1;
+        outline: 0;
+    }
+    section.range-slider input::-moz-range-thumb {
+        pointer-events: all;
+        position: relative;
+        z-index: 10;
+        -moz-appearance: none;
+        width: 9px;
+    }
+    section.range-slider input::-moz-range-track {
+        position: relative;
+        z-index: -1;
+        background-color: rgba(0, 0, 0, 1);
+        border: 0;
+    }
+    section.range-slider input:last-of-type::-moz-range-track {
+        -moz-appearance: none;
+        background: none transparent;
+        border: 0;
+    }
+    section.range-slider input[type=range]::-moz-focus-outer {
+        border: 0;
+    }
+    .chStartTxt {
+        float: left;
+        position: relative;
+        right: 30px;
+    }
+    .chEndTxt {
+        float: right;
+        position: relative;
+        left: 30px;
+    }
 </style>
 
 <body>
@@ -136,6 +237,13 @@ $(function(){
                     </div>
                   </div>
 
+                    <section class="range-slider">
+                        <span class="chStartTxt"></span>
+                        <input type="range" class="chStart">
+                        <input type="range" class="chEnd">
+                        <span class="chEndTxt"></span>
+                    </section>
+
                   <hr>
 
                   <div class="form-group">
@@ -150,7 +258,12 @@ $(function(){
                     </div>
                   </div>
 
-
+                    <section class="range-slider">
+                        <span class="chStartTxt"></span>
+                        <input type="range" class="chStart">
+                        <input type="range" class="chEnd">
+                        <span class="chEndTxt"></span>
+                    </section>
                   <hr>
 
                   <div class="form-group">
@@ -164,6 +277,13 @@ $(function(){
                         </ul>
                     </div>
                   </div>
+
+                    <section class="range-slider">
+                        <span class="chStartTxt"></span>
+                        <input type="range" class="chStart">
+                        <input type="range" class="chEnd">
+                        <span class="chEndTxt"></span>
+                    </section>
 
                 </form>
 

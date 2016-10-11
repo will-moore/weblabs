@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<script   src="http://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+
+<script>
+$(function(){
+
+    var baseUrl = "https://lincs-omero.hms.harvard.edu/"
+    var url = baseUrl + "webclient/imgData/1458547/?callback=?";
+
+    var imgData;
+    $.getJSON(url, function(data){
+        console.log(data);
+        imgData = data;
+
+        // get lists of channels to populate drop-downs
+        var chHtml = data.channels.map(function(ch, idx){
+            return '<li><a href="#" data-index="' + idx + '">' + ch.label + '</a></li>';
+        })
+        chHtml = chHtml.join("");
+        $(".channelList").html(chHtml);
+
+        // Hack! Manually set channelsLabel.data then render() image. 
+        $(".channelLabel").each(function(){
+            var $this = $(this);
+            var chIdx = $this.attr('data-chIdx');
+            console.log(chIdx);
+            $this.data('chIdx', parseInt(chIdx, 10));
+        });
+        render();
+    });
+
+    function compareIdx(a,b) {
+      if (a.idx < b.idx)
+        return -1;
+      if (a.idx > b.idx)
+        return 1;
+      return 0;
+    }
+
+    // Click on Channel drop-down list - pick channel name then render()
+    $(".channelList").on("click", "a", function(event) {
+        event.preventDefault();
+        var $this = $(this);
+
+        var $label = $this.parents('.form-group').find('.channelLabel');
+
+        var chIdx = $this.attr('data-index');
+        var chLabel = $this.text();
+        console.log(chIdx, chLabel);
+        $label.text(chLabel);
+        $label.data('chIdx', parseInt(chIdx, 10));
+        render();
+    });
+
+
+    // Get image src from channel settings and set image src.
+    function render(){
+        var channels = [];
+        var colors = ['0000FF', '00FF00', 'FF0000'];
+        $(".channelLabel").each(function(i, ch){
+            console.log(ch, i, colors[i]);
+            var chIdx = $(this).data('chIdx');
+            if (chIdx !== undefined) {
+                chIdx = parseInt(chIdx, 10);
+                channels.push({'idx': chIdx, 'color': colors[i]});
+            }
+        });
+        console.log(channels);
+        channels.sort(compareIdx);
+
+        var chs = channels.map(function(ch){
+            return (ch.idx + 1) + '$' + ch.color;
+        });
+        chs = chs.join(',');
+        var src = baseUrl + "webclient/render_image/1458547/0/0/?c=" + chs;
+        console.log(src);
+
+        $('#image').attr('src', src);
+    }
+
+    $("#zoomSlider").on('input', function () {
+        var zoom = parseInt($(this).val(), 10);
+        console.log(zoom, imgData);
+        $("#zoomLabel").text("Zoom: " + zoom + "%");
+        var imgW = imgData.size.width * zoom / 100;
+        var imgH = imgData.size.height * zoom / 100;
+        console.log(imgW, imgH);
+        $("#image").css({'width': imgW, 'height': imgH});
+    });
+})
+</script>
+
+
+<style type="text/css">
+    #viewport {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #ddd;
+        z-index: 0;
+        overflow: scroll;
+    }
+    #controls {
+        width: 400px;
+        top: 15px;
+        position: absolute;
+        right: 20px;
+        z-index: 10;
+    }
+</style>
+
+<body>
+
+    <div class="modal-dialog" role="document" id="controls">
+        <div class="modal-content">
+<!--             <div class="modal-header">
+                <h4 class="modal-title">Modal title</h4>
+            </div> -->
+            <div class="modal-body">
+
+                <form class="form-inline">
+                  <div class="form-group">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="channelLabel" data-chIdx="0">Hoechst1</span>
+                        <span class="caret"></span>
+                      </button>
+                        <ul class="dropdown-menu channelList">
+                            <!-- Channel names added here -->
+                        </ul>
+                    </div>
+                  </div>
+
+                  <hr>
+
+                  <div class="form-group">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="channelLabel" data-chIdx="15">FITC7:EGFR</span>
+                        <span class="caret"></span>
+                      </button>
+                        <ul class="dropdown-menu channelList">
+                            <!-- Channel names added here -->
+                        </ul>
+                    </div>
+                  </div>
+
+
+                  <hr>
+
+                  <div class="form-group">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="channelLabel" data-chIdx="32">Cy5-6:AKT</span>
+                        <span class="caret"></span>
+                      </button>
+                        <ul class="dropdown-menu channelList">
+                            <!-- Channel names added here -->
+                        </ul>
+                    </div>
+                  </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="pull-left" id="zoomLabel">Zoom: 100%</div>
+                <input id="zoomSlider" min="25" max="500" value="100" type="range"></input>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+
+
+    <div id="viewport">
+        <img id="image"></img>
+    </div>
+
+</body>
+
+</html>

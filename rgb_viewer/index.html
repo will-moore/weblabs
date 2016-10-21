@@ -7,8 +7,16 @@
 <script>
 $(function(){
 
+    var query = location.search.substr(1);
+    var imageId = 1458547;
+    var args = query.split('image=');
+    console.log(args);
+    if (args.length > 1) {
+        imageId = parseInt(args[1]);
+    }
+
     var baseUrl = "https://lincs-omero.hms.harvard.edu/"
-    var url = baseUrl + "webclient/imgData/1458547/?callback=?";
+    var url = baseUrl + "webclient/imgData/" + imageId + "/?callback=?";
 
     var imgData;
     $.getJSON(url, function(data){
@@ -116,7 +124,7 @@ $(function(){
             return (ch.idx + 1) + '|' + w.start + ':' + w.end + '$' + ch.color;
         });
         chs = chs.join(',');
-        var src = baseUrl + "webclient/render_image/1458547/0/0/?c=" + chs;
+        var src = baseUrl + "webclient/render_image/" + imageId + "/0/0/?c=" + chs;
         console.log(src);
 
         $('#image').attr('src', src);

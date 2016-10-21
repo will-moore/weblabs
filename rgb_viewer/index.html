@@ -10,7 +10,6 @@ $(function(){
     var query = location.search.substr(1);
     var imageId = 1458547;
     var args = query.split('image=');
-    console.log(args);
     if (args.length > 1) {
         imageId = parseInt(args[1]);
     }
@@ -20,7 +19,6 @@ $(function(){
 
     var imgData;
     $.getJSON(url, function(data){
-        console.log(data);
         imgData = data;
 
         // get lists of channels to populate drop-downs
@@ -34,7 +32,6 @@ $(function(){
         $(".channelLabel").each(function(){
             var $this = $(this);
             var chIdx = $this.attr('data-chIdx');
-            console.log(chIdx);
             $this.data('chIdx', parseInt(chIdx, 10));
         });
         // Populate channels sliders and render image
@@ -59,7 +56,6 @@ $(function(){
 
         var chIdx = $this.attr('data-index');
         var chLabel = $this.text();
-        console.log(chIdx, chLabel);
         $label.text(chLabel);
         $label.data('chIdx', parseInt(chIdx, 10));
 
@@ -73,7 +69,6 @@ $(function(){
         // update the imgData store...
         var $this = $(this);
         var chIdx = $this.data('chIdx');
-        console.log(chIdx, parseInt($this.val()));
         imgData.channels[chIdx].window.start = parseInt($this.val(), 10);
         render();
     });
@@ -81,9 +76,17 @@ $(function(){
         // update the imgData store...
         var $this = $(this);
         var chIdx = $this.data('chIdx');
-        console.log(chIdx, parseInt($this.val()));
         imgData.channels[chIdx].window.end = parseInt($this.val(), 10);
         render();
+    });
+    // On 'slide' sliding channel sliders, show values...
+    $('input.chStart').on('input', function(){
+        var $this = $(this);
+        var chIdx = $this.parents(".range-slider").find('.chStartTxt').text($this.val());
+    });
+    $('input.chEnd').on('input', function(){
+        var $this = $(this);
+        var chIdx = $this.parents(".range-slider").find('.chEndTxt').text($this.val());
     });
 
 
@@ -98,8 +101,10 @@ $(function(){
             var $this = $(section);
             $('input', $this).attr({'min': w.min, 'max': w.max})
                              .data('chIdx', channels[i]);
-            $('input.chStart').val(w.start);
-            $('input.chEnd').val(w.end);
+            $('input.chStart', $this).val(w.start);
+            $('input.chEnd', $this).val(w.end);
+            $('span.chStartTxt', $this).text(w.start);
+            $('span.chEndTxt', $this).text(w.end);
         });
     };
 
@@ -109,14 +114,12 @@ $(function(){
         var channels = [];
         var colors = ['0000FF', '00FF00', 'FF0000'];
         $(".channelLabel").each(function(i, ch){
-            console.log(ch, i, colors[i]);
             var chIdx = $(this).data('chIdx');
             if (chIdx !== undefined) {
                 chIdx = parseInt(chIdx, 10);
                 channels.push({'idx': chIdx, 'color': colors[i]});
             }
         });
-        console.log(channels);
         channels.sort(compareIdx);
 
         var chs = channels.map(function(ch){
@@ -125,18 +128,15 @@ $(function(){
         });
         chs = chs.join(',');
         var src = baseUrl + "webclient/render_image/" + imageId + "/0/0/?c=" + chs;
-        console.log(src);
 
         $('#image').attr('src', src);
     }
 
     $("#zoomSlider").on('input', function () {
         var zoom = parseInt($(this).val(), 10);
-        console.log(zoom, imgData);
         $("#zoomLabel").text("Zoom: " + zoom + "%");
         var imgW = imgData.size.width * zoom / 100;
         var imgH = imgData.size.height * zoom / 100;
-        console.log(imgW, imgH);
         $("#image").css({'width': imgW, 'height': imgH});
     });
 })
@@ -214,12 +214,14 @@ $(function(){
     .chStartTxt {
         float: left;
         position: relative;
-        right: 30px;
+        right: 45px;
+        top: 5px;
     }
     .chEndTxt {
         float: right;
         position: relative;
-        left: 30px;
+        left: 45px;
+        top: 5px;
     }
 </style>
 

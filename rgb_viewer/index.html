@@ -21,6 +21,12 @@ $(function(){
     $.getJSON(url, function(data){
         imgData = data;
 
+        console.log(imgData);
+        if (imgData.size.width * imgData.size.height > 9000000) {
+            alert("This viewer doesn't support BIG (tiled) images. Image is " + imgData.size.width + " x " +imgData.size.height);
+            return;
+        }
+
         // get lists of channels to populate drop-downs
         var chHtml = data.channels.map(function(ch, idx){
             return '<li><a href="#" data-index="' + idx + '">' + ch.label + '</a></li>';

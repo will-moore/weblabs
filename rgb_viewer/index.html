@@ -248,16 +248,23 @@ $(function(){
 
     <div class="modal-dialog" role="document" id="controls">
         <div class="modal-content">
-<!--             <div class="modal-header">
-                <h4 class="modal-title">Modal title</h4>
-            </div> -->
-            <div class="modal-body">
+            <div class="modal-body" style="padding: 0">
+
+                <!-- TABS -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#channelTab" data-toggle="tab">Channels</a></li>
+                    <li role="presentation"><a href="#aboutTab" data-toggle="tab">About</a></li>
+                </ul>
+
+                <!-- CONTENT -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="channelTab">
 
                 <form class="form-inline">
                   <div class="form-group">
                     <div class="btn-group">
                       <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <span class="channelLabel" data-chIdx="0">Hoechst1</span>
+                        <span class="channelLabel">Blue</span>
                         <span class="caret"></span>
                       </button>
                         <ul class="dropdown-menu channelList">
@@ -316,6 +323,25 @@ $(function(){
 
                 </form>
 
+            </div>
+
+            <!-- ABOUT TAB -->
+            <div role="tabpanel" class="tab-pane" id="aboutTab">
+                <p>
+                    This is a prototype viewer for images at
+                    <a href="https://lincs-omero.hms.harvard.edu/webclient/" target="_blank">
+                        https://lincs-omero.hms.harvard.edu/webclient/</a>.
+                </p>
+                <p>
+                    Browse images at that link, pick the image ID and add it
+                    to this browser url. E.g. 
+                    <a href="http://will-moore.github.io/weblabs/rgb_viewer/?image=1497641">
+                        will-moore.github.io/weblabs/rgb_viewer/?image=1497641
+                    </a>
+                </p>
+            </div>
+            
+            </div>
             </div>
             <div class="modal-footer">
                 <div class="pull-left" id="zoomLabel">Zoom: 100%</div>

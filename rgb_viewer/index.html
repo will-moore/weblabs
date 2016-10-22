@@ -35,15 +35,19 @@ $(function(){
         $(".channelList").html(chHtml);
 
         // Hack! Manually set channelsLabel.data then render() image. 
-        $(".channelLabel").each(function(){
-            var $this = $(this);
-            var chIdx = $this.attr('data-chIdx');
-            $this.data('chIdx', parseInt(chIdx, 10));
+        var selectedChs = [0, 15, 32];
+        if (data.channels.length < 33) {
+            selectedChs = [0,1,2];
+        }
+        $(".channelLabel").each(function(i){
+            $(this).data('chIdx', selectedChs[i]);
         });
         // Populate channels sliders and render image
         renderSliders();
         render();
-    });
+    }).fail(function(){
+        alert("Failed to load image data from " + url);
+    })
 
     function compareIdx(a,b) {
       if (a.idx < b.idx)

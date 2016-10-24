@@ -27,6 +27,12 @@ $(function(){
             return;
         }
 
+        // Basic display of Image name, id, link
+        $("#imgName").text(imgData.meta.imageName);
+        $("#imgId").text(imgData.id);
+        $("#imgLink").attr('href', baseUrl + "webclient/?show=image-" + imgData.id);
+
+
         // get lists of channels to populate drop-downs
         var chHtml = data.channels.map(function(ch, idx){
             return '<li><a href="#" data-index="' + idx + '">' + ch.label + '</a></li>';
@@ -260,6 +266,14 @@ $(function(){
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="channelTab">
 
+                <h4 id="imgName"></h4>
+                <p>
+                    ID: <span id="imgId"></span>
+                    <span class="pull-right">
+                        <a id="imgLink" href="" target="_blank">Show Image at Lincs</a>
+                    </span>
+                </p>
+
                 <form class="form-inline">
                   <div class="form-group">
                     <div class="btn-group">
@@ -333,10 +347,15 @@ $(function(){
                         https://lincs-omero.hms.harvard.edu/webclient/</a>.
                 </p>
                 <p>
-                    Browse images at that link, pick the image ID and add it
-                    to this browser url. E.g. 
-                    <a href="http://will-moore.github.io/weblabs/rgb_viewer/?image=1497641">
-                        will-moore.github.io/weblabs/rgb_viewer/?image=1497641
+                    It is designed to handle images with many channels, such as the CycIF
+                    images in <a href="https://lincs-omero.hms.harvard.edu/webclient/?show=dataset-1602">
+                    this Dataset</a>.
+                </p>
+                <p>
+                    To open images in this viewer, browse images at that link, pick the image ID and add it
+                    to this browser url. E.g. default image is:
+                    <a href="http://will-moore.github.io/weblabs/rgb_viewer/?image=1458547">
+                        will-moore.github.io/weblabs/rgb_viewer/?image=1458547
                     </a>
                 </p>
             </div>
